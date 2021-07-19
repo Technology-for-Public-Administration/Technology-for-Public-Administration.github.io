@@ -1,0 +1,11 @@
+.information {
+    padding: 0 2px;
+}
+
+.information li {
+    margin: 5px 2px;
+}
+
+.information li span {
+    color: red;
+}

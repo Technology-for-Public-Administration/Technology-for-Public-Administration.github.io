@@ -1,0 +1,114 @@
+
+
+
+
+
+
+
+
+
+
+         
+
+
+
+
+<script type="text/javascript">
+    $import('/mailCount/style/information.css');
+</script>
+<div id="imagef204" style="display:none;">
+   <img src="/mailCount/images/anim_loading_sm.gif"/>
+</div>
+<div>
+    <ul id="informationf204" class="information">
+        <img id="imgf204" src="/mailCount/images/anim_loading_sm.gif" alt=""/>
+    </ul>
+</div>
+<script type="text/javascript">
+    Ext.onReady(function(){
+           function loadInformation(){
+               $('imagef204').show();
+               //Ext.DomHelper.insertHtml('AfterBegin',Ext.getDom("informationf204"),'<img src="/mailCount/images/anim_loading_sm.gif"/>');
+               //Ext.DomHelper.overwrite('informationf204','<img src="/mailCount/images/anim_loading_sm.gif"/>');
+               new Ajax.Request('pnull.portal?.f=f204&.pmn=view&action=informationCenterAjax&.ia=false&.pen=pe29',{
+                            method: 'post',
+                            onSuccess:function(transport) {
+                                var informationJA = Ext.util.JSON.decode(transport.responseText);
+                                var content =[];
+                                for(var i=0;i<informationJA.length;i++){
+                                    var information = informationJA[i];
+                                    var imageSrc ='';
+                                    var img = '';
+                                    if(information['attchmentId'] && information['attchmentId']!='' && information['attchmentId'] !=null && information['needShowPic']==1){
+                                         imageSrc = "attachmentDownload.portal?notUseCache=true&attachmentId=" + information['attchmentId'];
+                                         img = '<img width="16px" height="16px" src="' + imageSrc + '"/>';
+                                    }
+                                    var con={};
+                                    if(information['needAuthIntegration'] == 1 && !information['authIntegration'] && !information['needUpdate']){
+                                        var a = img + information.title+'此条提醒您还没配置，请<a onclick="showAuthIntegration(this,event,{informationID:'+information.id+'});"><span>配置</span></a>';
+                                        con = {tag:'li',id:'li'+information.id,html:a};
+                                    }else if(information['needAuthIntegration'] == 1 && information['needUpdate']){
+                                        var b = img + information.title+'无法得到数据，请您更新配置,<a onclick="showAuthIntegration(this,event,{informationID:'+information.id+'});"><span>更新</span></a>';
+                                        con = {tag:'li',id:'li'+information.id,html:b};
+                                    }else{
+                                        var href = '';
+                                        if(information.lookLinkOnClick==0)
+                                             href = (information.linkUrl==null || information.linkUrl=='') ? '' : '<a target="_blank" style="margin-left:6px" href="'+information.linkUrl+'">查看</a>';
+                                        else
+                                            href = (information.linkUrl==null || information.linkUrl=='') ? '' : '<a  style="margin-left:6px;cursor:pointer" onclick="'+information.linkUrl+'">查看</a>';
+                                        con = '<li>'+img + information.title+information.description+href+'</li>';
+                                    }
+                                    content.push(con);
+                                }
+                                $('imagef204').hide();
+                                Ext.DomHelper.overwrite('informationf204',content);
+                                Ext.get('informationf204').clean();
+                            }
+            });
+        }
+        loadInformation();
+        /*setInterval(loadInformation,300000);*/
+    });
+     function showAuthIntegration(a, event,params) {
+            var auForm = new Portal.AuthIntegrateForm(a,event);
+            auForm.formSubmit=function(){
+                if(!auForm.validateForm()){return true}
+                var p ='';
+                for(var o in params){
+                   p +="&"+o+"="+params[o];
+                }
+                new Ajax.Request('pnull.portal?.f=f204&.pmn=view&action=userIdentificationAdd&.ia=true&.pen=pe29', {
+                            method: 'post',
+                            parameters: 'userName=' + auForm.getUserName()+'&password='+auForm.getPassword() + p + '&s=' + Math.random(),
+                            onSuccess:function(transport) {
+                                var result = Ext.util.JSON.decode(transport.responseText);
+                                if (result.success=='yes') {
+                                    auForm.hideForm();
+                                    var image = '<img src="/mailCount/images/anim_loading_sm.gif"/>';
+                                    Ext.DomHelper.overwrite('li'+params['informationID'],image);
+                                    new Ajax.Request('pnull.portal?.f=f204&.pmn=view&action=informationCenterAjax&.ia=false&.pen=pe29',{
+                                        method: 'post',
+                                        parameters: p,
+                                        onSuccess:function(transport) {
+                                            var informationJA = Ext.util.JSON.decode(transport.responseText);
+                                            var information = informationJA[0];
+                                            var imageSrc = "attachmentDownload.portal?notUseCache=true&attachmentId=" + information['attchmentId'];
+                                            var img = '<img width="16px" height="16px" src="' + imageSrc + '"/>';
+                                            var content;
+                                            if(information['needAuthIntegration'] == 1 && !information['authIntegration'] && !information['needUpdate']){
+                                                content = img + information.title+'此条提醒您还没配置，请<a onclick="showAuthIntegration(this,event,{informationID:'+information.id+'});"><span>配置</span></a>';
+                                            }else if(information['needAuthIntegration'] == 1 && information['needUpdate']){
+                                                content = img + information.title+'无法得到数据，请您更新配置,<a onclick="showAuthIntegration(this,event,{informationID:'+information.id+'});"><span>更新</span></a>';
+                                            }else{
+                                                content = img + information.title+information.description+'<a target="_blank" style="margin-left:6px" href="'+information.linkUrl+'">查看</a>';
+                                            }
+                                            Ext.DomHelper.overwrite('li'+information['id'],content);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+            };
+            auForm.show();
+        }
+</script>

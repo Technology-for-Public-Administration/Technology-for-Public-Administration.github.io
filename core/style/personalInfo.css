@@ -1,0 +1,32 @@
+ .composer_header {}
+
+ .ar_r_t {
+     margin: 5px 5px 0 15px;
+     overflow: hidden;
+     background: url("../images/avatar_bg.gif") no-repeat scroll right top #FFFFFF;
+     float: left;
+     display: inline
+ }
+
+ .ar_l_t {
+     background: url("../images/avatar_bg.gif") no-repeat scroll left top transparent;
+     padding: 5px 0 0;
+ }
+
+ .ar_r_b {
+     background: url("../images/avatar_bg.gif") no-repeat scroll right bottom transparent;
+ }
+
+ .ar_l_b {
+     background: url("../images/avatar_bg.gif") no-repeat scroll left bottom transparent;
+     padding: 0 12px 12px 5px;
+ }
+
+ .composer {
+     overflow: hidden;
+     padding: 0px 10px 10px 5px;
+ }
+
+ .composer li {
+     padding: 2px 2px 2px 2px;
+ }
